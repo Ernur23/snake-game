@@ -11,26 +11,27 @@ class Data_Setting():
     def __init__(self):
         self.screen_size = (1920, 1080)
         self.db = FileData()
-        self.coins = 0
         self.config_path = os.path.join(os.path.dirname(__file__), 'Setting_change.json')
         self.volume = 50
         self.load_settings()
+        self.coins = User_Coins(self)
+        self.selected_skin = 'default'
 
     def load_settings(self):
         if os.path.exists(self.config_path):
             with open(self.config_path, 'r') as f:
                 data = json.load(f)
                 self.volume = data.get('volume', 50)
-                self.coins = data.get('coins', 0)
-                self.lives = data.get('lives', 0)
+                self.coins_amount = data.get('coins', 0)
+                self.selected_skin = data.get('selected_skin', 'default')
 
         pygame.mixer.music.set_volume(self.volume / 100)
 
     def save_settings(self):
         data = {
             'volume': self.volume,
-            'coins': self.coins,
-            'lives': self.lives
+            'coins': self.coins.amount,
+            'selected_skin': self.selected_skin
         }
         with open(self.config_path, 'w') as f:
             json.dump(data, f, indent=4)
@@ -41,6 +42,11 @@ class FileData():
         self.script_path = os.path.dirname(__file__)
         self.sound_dir_path = os.path.join(self.script_path, 'Soundtracks')
         self.image_dir_path = os.path.join(self.script_path, 'Images')
+        self.snakes_dir = os.path.join(self.image_dir_path, 'Snakes')
+        self.static_evil_dir = os.path.join(self.image_dir_path, 'Static_Evil')
+        self.dynamic_evil_dir = os.path.join(self.image_dir_path, 'Dimanic_Evil')
+        self.object_dir = os.path.join(self.image_dir_path, 'Object')
+        self.bg_dir = os.path.join(self.image_dir_path, 'Background')
 
         self.sound = {
             'mm_sound': os.path.join(self.sound_dir_path, 'sound2.mp3'),
@@ -50,48 +56,92 @@ class FileData():
             'snake_heat_border': os.path.join(self.sound_dir_path, 'snake_border.mp3'),
             'lvl1_sound': os.path.join(self.sound_dir_path, 'lvl1_sound.mp3'),
             'shop_menu_sound': os.path.join(self.sound_dir_path, 'shop_sound.mp3'),
-            'hadgehog_sound': os.path.join(self.sound_dir_path, 'hadgehog_sound.mp3')
+            'hadgehog_sound': os.path.join(self.sound_dir_path, 'hadgehog_sound.mp3'),
+            'eagle_sound': os.path.join(self.sound_dir_path, 'eagle_sound.mp3')
         }
 
         self.images = {
-            'mm_menu_img': os.path.join(self.image_dir_path, 'menu_img.png'),
-            'st_menu_img': os.path.join(self.image_dir_path, 'setng_menu.png'),
-            'sh_menu_img': os.path.join(self.image_dir_path, 'shop_menu.png'),
-            'apple_img': os.path.join(self.image_dir_path, 'apple_img.png'),
-            'lvl1_bg': os.path.join(self.image_dir_path, 'bg_1lvl_img.png'),
-            'lvl2_bg': os.path.join(self.image_dir_path, 'bg_2lvl_img.png'),
-            'lvl3_bg': os.path.join(self.image_dir_path, 'bg_3lvl_img.png'),
-            'lvl4_bg': os.path.join(self.image_dir_path, 'bg_4lvl_img.png'),
-            'lvl5_bg': os.path.join(self.image_dir_path, 'bg_5lvl_img.png'),
-            'head_up': os.path.join(self.image_dir_path, 'head_up_img.png'),
-            'head_down': os.path.join(self.image_dir_path, 'head_down_img.png'),
-            'head_right': os.path.join(self.image_dir_path, 'head_right_img.png'),
-            'head_left': os.path.join(self.image_dir_path, 'head_left_img.png'),
-            'body_up': os.path.join(self.image_dir_path, 'body_up_img.png'),
-            'body_left': os.path.join(self.image_dir_path, 'body_left_img.png'),
-            'body_move': os.path.join(self.image_dir_path, 'body_move_img.png'),
-            'coin': os.path.join(self.image_dir_path, 'coin_img.png'),
-            'eye1': os.path.join(self.image_dir_path, 'eye1.png'),
-            'eye2': os.path.join(self.image_dir_path, 'eye2.png'),
-            'eye3': os.path.join(self.image_dir_path, 'eye3.png'),
-            'eye4': os.path.join(self.image_dir_path, 'eye4.png'),
-            'eye5': os.path.join(self.image_dir_path, 'eye5.png'),
-            'eye6': os.path.join(self.image_dir_path, 'eye6.png'),
-            'eye7': os.path.join(self.image_dir_path, 'eye7.png'),
-            'ezh1': os.path.join(self.image_dir_path, 'zub_1.png'),
-            'ezh2': os.path.join(self.image_dir_path, 'zub_2.png'),
-            'ezh3': os.path.join(self.image_dir_path, 'zub_3.png'),
-            'ezh4': os.path.join(self.image_dir_path, 'zub_4.png'),
-            'ezh5': os.path.join(self.image_dir_path, 'zub_5.png'),
-            'ezh6': os.path.join(self.image_dir_path, 'zub_6.png'),
-            'ezh7': os.path.join(self.image_dir_path, 'zub_7.png'),
-            'ezh8': os.path.join(self.image_dir_path, 'zub_8.png'),
-            'eagle1': os.path.join(self.image_dir_path, 'eagle_up.png'),
-            'eagle2': os.path.join(self.image_dir_path, 'eagle_down.png'),
-            'eagle3': os.path.join(self.image_dir_path, 'eagle_left.png'),
-            'eagle4': os.path.join(self.image_dir_path, 'eagle_right.png'),
-            'heart_elexir_icon': os.path.join(self.image_dir_path, 'heart_elexir.png'),
-            'Shooting_star_icon': os.path.join(self.image_dir_path, 'shooting_star.png'),
+            'mm_menu_img': os.path.join(self.bg_dir, 'menu_img.png'),
+            'st_menu_img': os.path.join(self.bg_dir, 'setng_menu.png'),
+            'sh_menu_img': os.path.join(self.bg_dir, 'shop_menu.png'),
+            'lvl1_bg': os.path.join(self.bg_dir, 'bg_1lvl_img.png'),
+            'lvl2_bg': os.path.join(self.bg_dir, 'bg_2lvl_img.png'),
+            'lvl3_bg': os.path.join(self.bg_dir, 'bg_3lvl_img.png'),
+            'lvl4_bg': os.path.join(self.bg_dir, 'bg_4lvl_img.png'),
+            'lvl5_bg': os.path.join(self.bg_dir, 'bg_5lvl_img.png'),
+            'heart_elexir_icon': os.path.join(self.bg_dir, 'heart_elexir.png'),
+            'Shooting_star_icon': os.path.join(self.bg_dir, 'shooting_star.png'),
+            'inventory': os.path.join(self.bg_dir, 'inventory_menu.png'),
+
+            'head_up': os.path.join(self.snakes_dir, 'head_up_img.png'),
+            'head_down': os.path.join(self.snakes_dir, 'head_down_img.png'),
+            'head_right': os.path.join(self.snakes_dir, 'head_right_img.png'),
+            'head_left': os.path.join(self.snakes_dir, 'head_left_img.png'),
+            'body_up': os.path.join(self.snakes_dir, 'body_up_img.png'),
+            'body_left': os.path.join(self.snakes_dir, 'body_left_img.png'),
+            'body_move': os.path.join(self.snakes_dir, 'body_move_img.png'),
+
+            'red_up': os.path.join(self.snakes_dir, 'red_snake_head_up.png'),
+            'red_down': os.path.join(self.snakes_dir, 'red_snake_head_down.png'),
+            'red_right': os.path.join(self.snakes_dir, 'red_snake_head_right.png'),
+            'red_left': os.path.join(self.snakes_dir, 'red_snake_head_left.png'),
+            'red_goriz': os.path.join(self.snakes_dir, 'red_snake_gorizontal.png'),
+            'red_vertical': os.path.join(self.snakes_dir, 'red_snake_vertical.png'),
+
+            'blue_up': os.path.join(self.snakes_dir, 'blue_snake_head_up.png'),
+            'blue_down': os.path.join(self.snakes_dir, 'blue_snake_head_down.png'),
+            'blue_right': os.path.join(self.snakes_dir, 'blue_snake_head_right.png'),
+            'blue_left': os.path.join(self.snakes_dir, 'blue_snake_head_left.png'),
+            'blue_goriz': os.path.join(self.snakes_dir, 'blue_snake_gorizontal.png'),
+            'blue_vertical': os.path.join(self.snakes_dir, 'blue_snake_vertical.png'),
+
+            'yellow_up': os.path.join(self.snakes_dir, 'yellow_snake_head_up.png'),
+            'yellow_down': os.path.join(self.snakes_dir, 'yellow_snake_head_down.png'),
+            'yellow_right': os.path.join(self.snakes_dir, 'yellow_snake_head_right.png'),
+            'yellow_left': os.path.join(self.snakes_dir, 'yellow_snake_head_left.png'),
+            'yellow_goriz': os.path.join(self.snakes_dir, 'yellow_snake_gorizontal.png'),
+            'yellow_vertical': os.path.join(self.snakes_dir, 'yellow_snake_vertical.png'),
+
+            'purple_up': os.path.join(self.snakes_dir, 'purple_snake_head_up.png'),
+            'purple_down': os.path.join(self.snakes_dir, 'purple_snake_head_down.png'),
+            'purple_right': os.path.join(self.snakes_dir, 'purple_snake_head_right.png'),
+            'purple_left': os.path.join(self.snakes_dir, 'purple_snake_head_left.png'),
+            'purple_goriz': os.path.join(self.snakes_dir, 'purple_snake_gorizontal.png'),
+            'purple_vertical': os.path.join(self.snakes_dir, 'purple_snake_vertical.png'),
+
+            'orange_up': os.path.join(self.snakes_dir, 'orange_snake_head_up.png'),
+            'orange_down': os.path.join(self.snakes_dir, 'orange_snake_head_down.png'),
+            'orange_right': os.path.join(self.snakes_dir, 'orange_snake_head_right.png'),
+            'orange_left': os.path.join(self.snakes_dir, 'orange_snake_head_left.png'),
+            'orange_goriz': os.path.join(self.snakes_dir, 'orange_snake_gorizontal.png'),
+            'orange_vertical': os.path.join(self.snakes_dir, 'orange_snake_vertical.png'),
+            
+
+            'apple_img': os.path.join(self.object_dir, 'apple_img.png'),
+            'coin': os.path.join(self.object_dir, 'coin_img.png'),
+            'heart_elexir_pin': os.path.join(self.object_dir, 'heart_elexir_pin.png'),
+            'shooting_star_pin': os.path.join(self.object_dir, 'shooting_star_pin.png'),
+
+            'eye1': os.path.join(self.static_evil_dir, 'eye1.png'),
+            'eye2': os.path.join(self.static_evil_dir, 'eye2.png'),
+            'eye3': os.path.join(self.static_evil_dir, 'eye3.png'),
+            'eye4': os.path.join(self.static_evil_dir, 'eye4.png'),
+            'eye5': os.path.join(self.static_evil_dir, 'eye5.png'),
+            'eye6': os.path.join(self.static_evil_dir, 'eye6.png'),
+            'eye7': os.path.join(self.static_evil_dir, 'eye7.png'),
+            'ezh1': os.path.join(self.static_evil_dir, 'zub_1.png'),
+            'ezh2': os.path.join(self.static_evil_dir, 'zub_2.png'),
+            'ezh3': os.path.join(self.static_evil_dir, 'zub_3.png'),
+            'ezh4': os.path.join(self.static_evil_dir, 'zub_4.png'),
+            'ezh5': os.path.join(self.static_evil_dir, 'zub_5.png'),
+            'ezh6': os.path.join(self.static_evil_dir, 'zub_6.png'),
+            'ezh7': os.path.join(self.static_evil_dir, 'zub_7.png'),
+            'ezh8': os.path.join(self.static_evil_dir, 'zub_8.png'),
+
+            'eagle1': os.path.join(self.dynamic_evil_dir, 'eagle_up.png'),
+            'eagle2': os.path.join(self.dynamic_evil_dir, 'eagle_down.png'),
+            'eagle3': os.path.join(self.dynamic_evil_dir, 'eagle_left.png'),
+            'eagle4': os.path.join(self.dynamic_evil_dir, 'eagle_right.png'),
                     }
 
     def get_name(self, name):
@@ -305,13 +355,15 @@ class Coins(Food):
     def collect(self):
         self.active = False
 
+
+
 class Snake_Basic:
-    def __init__(self, settings):
+    def __init__(self, settings, skin='blue' ):
         self.settings = settings
         self.db = settings.db
+        self.skin = skin
 
         self.cell_size = 20
-
         self.body = [(10, 5), (9, 5), (8, 5)]
 
         self.direction = (1, 0)
@@ -322,16 +374,34 @@ class Snake_Basic:
     def load_images(self):
         self.images = {}
 
-        self.images["head_up"] = pygame.image.load(self.db.get_name('head_up')).convert_alpha()
-        self.images["head_down"] = pygame.image.load(self.db.get_name('head_down')).convert_alpha()
-        self.images["head_left"] = pygame.image.load(self.db.get_name('head_left')).convert_alpha()
-        self.images["head_right"] = pygame.image.load(self.db.get_name('head_right')).convert_alpha()
+        if self.skin == 'default':
+            keys = {
+                "head_up": 'head_up',
+                "head_down": 'head_down',
+                "head_left": 'head_left',
+                "head_right": 'head_right',
+                "body_vertical": 'body_up',
+                "body_horizontal": 'body_left'
+                }
+        else:
+            prefix = self.skin
+            keys = {
+                "head_up": f'{prefix}_up',
+                "head_down": f'{prefix}_down',
+                "head_left": f'{prefix}_left',
+                "head_right": f'{prefix}_right',
+                "body_vertical": f'{prefix}_vertical',
+                "body_horizontal": f'{prefix}_goriz'
+                }
 
-        self.images["body_vertical"] = pygame.image.load(self.db.get_name('body_up')).convert_alpha()
-        self.images["body_horizontal"] = pygame.image.load(self.db.get_name('body_left')).convert_alpha()
+        for name, key in keys.items():
+            path = self.db.get_name(key)
 
-        for key in self.images:
-            self.images[key] = pygame.transform.scale(self.images[key], (20, 20))
+            if not path or not os.path.exists(path):
+                print(f"[ERROR] Не найдено изображение: {key}")
+                continue
+            img = pygame.image.load(path).convert_alpha()
+            self.images[name] = pygame.transform.scale(img, (20, 20))
 
     def handle_input(self, key):
         if key == pygame.K_w and self.direction != (0, 1):  
@@ -387,6 +457,39 @@ class Snake_Basic:
         else:
             return self.images["body_horizontal"]
 
+class Red_Snake(Snake_Basic):
+    def __init__(self, settings):
+        super().__init__(settings, skin='red')
+
+
+class Blue_Snake(Snake_Basic):
+    def __init__(self, settings):
+        super().__init__(settings, skin='blue')
+
+
+class Yellow_Snake(Snake_Basic):
+    def __init__(self, settings):
+        super().__init__(settings, skin='yellow')
+
+
+class Orange_Snake(Snake_Basic):
+    def __init__(self, settings):
+        super().__init__(settings, skin='orange')
+
+
+class Purple_Snake(Snake_Basic):
+    def __init__(self, settings):
+        super().__init__(settings, skin='purple')
+
+SNAKE_CLASSES = {
+    'default': Snake_Basic,
+    'red': Red_Snake,
+    'blue': Blue_Snake,
+    'yellow': Yellow_Snake,
+    'orange': Orange_Snake,
+    'purple': Purple_Snake
+}
+
 class Start_Game:
     def __init__(self, window, settings, bg_key=None, fps=10):
         self.window = window
@@ -414,7 +517,12 @@ class Start_Game:
                 print(f"Фон не найден: {self.bg_key}")
 
     def setup(self):
-        self.snake = Snake_Basic(self.settings)
+        snake_class = SNAKE_CLASSES.get(
+            self.settings.selected_skin,
+            Snake_Basic
+        )
+        self.snake = snake_class(self.settings)
+
         self.apple = Apple(self.settings)
         self.coin = Coins(self.settings)
         self.eye = Eye(self.settings)
@@ -506,8 +614,7 @@ class Start_Game:
         
         self.coin.try_spawn(self.snake.body)
         if self.coin.active and head == self.coin.position:
-            self.settings.coins += 1
-            self.settings.save_settings()
+            self.settings.coins.add(1)
 
             if self.sounds["coin"]:
                 self.sounds["coin"].play()
@@ -534,7 +641,7 @@ class Start_Game:
         self.eye.draw(self.game_surface)
 
         font = pygame.font.Font(None, 25)
-        text = font.render(f"Coins: {self.settings.coins}", True, (255, 255, 0))
+        text = font.render(f"Coins: {self.settings.coins.amount}", True, (255, 255, 0))
         self.game_surface.blit(text, (5, 5))
 
         scale_x = self.settings.screen_size[0] // 320
@@ -702,6 +809,9 @@ class Level_Menu(Base_Menu):
         self.menu.add.button('Back', self.menu.disable)
     
     def Start_Level(self, level):
+        inventory = Inventory_Menu(self.window, self.settings)
+        inventory.run()
+
         if level == 1:
             game = Level1(self.window, self.settings)
         elif level == 2:
@@ -756,7 +866,7 @@ class Shop_Menu(Base_Menu):
   
     def draw_coins(self, *args):
         font = pygame.font.Font(None, 100)
-        text = font.render(f"Coins: {self.settings.coins}", True, (255, 255, 0))
+        text = font.render(f"Coins: {self.settings.coins.amount}", True, (255, 255, 0))
         self.window.blit(text, (20, 20))
         self.handle_close_panel()
 
@@ -766,10 +876,67 @@ class Shop_Menu(Base_Menu):
                 rect = panel.get_rect(center=(960, 540))
                 self.window.blit(panel, rect)
 
+class Effects():
+    pass
+
+class User_Coins:
+    def __init__(self, settings):
+        self.settings = settings
+        self.amount = 0
+        self.load()
+
+    def load(self):
+        if os.path.exists(self.settings.config_path):
+            with open(self.settings.config_path, 'r') as f:
+                data = json.load(f)
+                self.amount = data.get('coins', 0)
+
+    def save(self):
+        if os.path.exists(self.settings.config_path):
+            with open(self.settings.config_path, 'r') as f:
+                data = json.load(f)
+        else:
+            data = {}
+
+        data['coins'] = self.amount
+
+        with open(self.settings.config_path, 'w') as f:
+            json.dump(data, f, indent=4)
+
+    def add(self, value):
+        self.amount += value
+        self.save()
+
+    def spend(self, value):
+        if self.amount >= value:
+            self.amount -= value
+            self.save()
+            return True
+        return False
+
+class User_Items():
+    pass
+
+class Inventory_Menu(Base_Menu):
+    def __init__(self, window, settings):
+        super().__init__('Inventory', window, settings, bg_key=None)
+        self.menu.add.label('Choose Snake')
+
+        for skin in SNAKE_CLASSES.keys():
+            self.menu.add.button(
+                skin,
+                lambda s=skin: self.select_skin(s)
+            )
+        self.menu.add.button('Back', self.menu.disable)
+
+    def select_skin(self, skin):
+        print(f"Выбран скин: {skin}")
+        self.settings.selected_skin = skin
+        self.settings.save_settings()
+
 class Setting_Menu(Base_Menu):
     def __init__(self, window, settings):
         super().__init__('Settings', window, settings, bg_key='st_menu_img')
-
         self.menu.add.range_slider(
             'Громкость: ',
             default=settings.volume, 
@@ -777,7 +944,7 @@ class Setting_Menu(Base_Menu):
             increment=1,
             value_format=lambda x: f'{int(x)}%',
             onchange=self.change_volume)
-        self.menu.add.button('Back', self.menu.disable)
+        self.menu.add.button('Play', self.menu.disable)
     
     def change_volume(self, value):
         self.settings.volume = int(value)
