@@ -920,17 +920,16 @@ class User_Items():
 class Inventory_Menu(Base_Menu):
     def __init__(self, window, settings):
         super().__init__('Inventory', window, settings, bg_key=None)
-        self.menu.add.label('Choose Snake')
+        self.menu.add.label('CHOICE SNAKE:')
 
         for skin in SNAKE_CLASSES.keys():
             self.menu.add.button(
                 skin,
                 lambda s=skin: self.select_skin(s)
             )
-        self.menu.add.button('Back', self.menu.disable)
+        self.menu.add.button('READY', self.menu.disable)
 
     def select_skin(self, skin):
-        print(f"Выбран скин: {skin}")
         self.settings.selected_skin = skin
         self.settings.save_settings()
 
@@ -944,7 +943,7 @@ class Setting_Menu(Base_Menu):
             increment=1,
             value_format=lambda x: f'{int(x)}%',
             onchange=self.change_volume)
-        self.menu.add.button('Play', self.menu.disable)
+        self.menu.add.button('Back', self.menu.disable)
     
     def change_volume(self, value):
         self.settings.volume = int(value)
